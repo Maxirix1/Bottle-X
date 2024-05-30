@@ -42,10 +42,10 @@ function Home() {
             </header>
 
             <div className="content-head">
-                <div className="background">
-                    <div className="circle circle1"></div>
-                    <div className="circle circle2"></div>
-                    <div className="circle circle3"></div>
+                <div className="bg-header">
+                    <div className="obj-cc one"></div>
+                    <div className="obj-cc two"></div>
+                    <div className="obj-cc three"></div>
                 </div>
 
                 <div className="text_head">
@@ -63,7 +63,9 @@ function Home() {
                     <h2>
                         | Bottle X <span>คืออะไร?</span>
                     </h2>
-                    <img src={Main} className="img-hidden" />
+                    <div className="img-hidden">
+                    <img src={Main}/>
+                    </div>
                     <p>
                         <span>Bottle X</span> โปรเจกต์ที่ชุมนุมคอมพิวเตอร์แบบพิเศษ(SCC)โรงเรียนวัดสุทธิวราราม โดยได้รับการเมตตาและสนับสนุนจากเจ้าอาวาสวัดสุทธิวราราม
                         จัดทำตู้รับขวดน้ำเพื่อนำไปแลกเป็นคะแนนพฤติกรรมและคะแนนความดีต่อไป ซึ่งมีจุดมุ่งหมายที่จะลดขยะประเภทขวดน้ำPET ที่มีการทิ้งตามสถานที่ต่างๆ 
