@@ -43,9 +43,7 @@ function Home() {
 
             <div className="content-head">
                 <div className="bg-header">
-                    <div className="obj-cc one"></div>
-                    <div className="obj-cc two"></div>
-                    <div className="obj-cc three"></div>
+                    <div className="obj-cc"></div>
                 </div>
 
                 <div className="text_head">
