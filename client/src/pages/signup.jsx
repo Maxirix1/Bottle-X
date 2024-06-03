@@ -41,7 +41,7 @@ function Signup() {
     return (
         <div className="container">
             <div className="content-regis">
-                <h2>Signup</h2>
+                <h2>Create Account</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="input-box">
                         <input type="text" placeholder="ชื่อ-นามสกุล (ไทย)" required 

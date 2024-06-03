@@ -7,21 +7,26 @@ import axios from 'axios';
 function Login() {
     const [ID, setID] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState(''); 
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrorMessage(''); // รีเซ็ตข้อความข้อผิดพลาดก่อนการส่งฟอร์ม
+        
         axios.post('http://localhost:3001/login', { ID, password })
-        .then(result => {
-            console.log(result);
-            navigate('/dashboard');
-        })
-        .catch(err => {
-            console.error(err);
-            setErrorMessage('การเข้าสู่ระบบล้มเหลว กรุณาตรวจสอบข้อมูลอีกครั้ง');
-        });
+            .then(result => {
+                console.log(result);
+                navigate('/dashboard');
+                setErrorMessage(''); // Clear error message on successful submission
+            })
+            .catch(err => {
+                console.error(err.response.data);
+                if (err.response && err.response.status === 400) {
+                    setErrorMessage(err.response.data.message);
+                } else {
+                    setErrorMessage('Login failed');
+                }
+            });
     }
 
     return (
