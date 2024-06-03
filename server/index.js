@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const cors = require("cors");
 const StudentModel = require('./models/Student');
+const existingStudents = require('./studentsData');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -12,14 +13,15 @@ app.post('/signup', async (req, res) => {
     const { name, ID, password } = req.body;
 
     try {
-        const existingName = await StudentModel.findOne({ name: name });
-        const existingID = await StudentModel.findOne({ ID: ID });
+        const studentData = existingStudents.find(student => student.ID === parseInt(ID) && student.name === name);
+        
+        if (!studentData) {
+            return res.status(400).json({ message: 'ชื่อและ Student ID ไม่ตรงกัน' });
+        }
 
-        if (existingName && existingID) {
-            return res.status(400).json({ message: 'ชื่อและ Student ID นี้ถูกใช้แล้ว' });
-        } else if (existingName) {
-            return res.status(400).json({ message: 'ชื่อนี้ถูกใช้แล้ว' });
-        } else if (existingID) {
+        const existingStudent = await StudentModel.findOne({ ID: ID });
+
+        if (existingStudent) {
             return res.status(400).json({ message: 'Student ID นี้ถูกใช้แล้ว' });
         }
 

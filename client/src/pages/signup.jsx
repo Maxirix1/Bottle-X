@@ -1,9 +1,8 @@
 import React, { useState } from 'react'; 
 import '../styles/signup.css';
 import '../styles/font.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 
 function Signup() {
     const [name, setName] = useState('');
@@ -11,7 +10,7 @@ function Signup() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -22,21 +21,20 @@ function Signup() {
         }
 
         axios.post('http://localhost:3001/signup', { name, ID, password })
-        .then(result => {
-            console.log(result);
-            navigate('/login');
-            setErrorMessage(''); // Clear error message on successful submission
-        })
-        .catch(err => {
-            console.error(err.response.data);
-            if (err.response && err.response.status === 400) {
-                setErrorMessage(err.response.data.message);
-            } else {
-                setErrorMessage('Signup failed');
-            }
-        });
-    
-    }
+            .then(result => {
+                console.log(result);
+                navigate('/login');
+                setErrorMessage(''); // Clear error message on successful submission
+            })
+            .catch(err => {
+                console.error(err.response.data);
+                if (err.response && err.response.status === 400) {
+                    setErrorMessage(err.response.data.message);
+                } else {
+                    setErrorMessage('Signup failed');
+                }
+            });
+    };
 
     return (
         <div className="container">
@@ -79,3 +77,4 @@ function Signup() {
 }
 
 export default Signup;
+``
