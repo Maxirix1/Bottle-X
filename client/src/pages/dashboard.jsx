@@ -1,9 +1,10 @@
 import React from 'react'
+import Menu from '../Components/Menu'
 
 function dashboard() {
   return (
     <div>
-        <h1>DASHBOARD pages.</h1>
+        <Menu />
     </div>
   )
 }
