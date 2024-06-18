@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const StudentSchema = new mongoose.Schema({
-    name: String,
-    ID: Number,
-    password: Number
+    name: { type: String, required: true },
+    ID: { type: Number, required: true, unique: true },
+    password: { type: String, required: true }
 });
 
 const StudentModel = mongoose.model("Students", StudentSchema);

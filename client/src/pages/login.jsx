@@ -10,23 +10,22 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
-        axios.post('http://localhost:3001/login', { ID, password })
-            .then(result => {
-                console.log(result);
-                navigate('/dashboard');
-                setErrorMessage(''); // Clear error message on successful submission
-            })
-            .catch(err => {
-                console.error(err.response.data);
-                if (err.response && err.response.status === 400) {
-                    setErrorMessage(err.response.data.message);
-                } else {
-                    setErrorMessage('Login failed');
-                }
-            });
+        try {
+            const response = await axios.post('http://localhost:3001/login', { ID, password });
+            console.log(response.data);
+            navigate('/manage', { state: { userID: response.data.student.ID } });
+            setErrorMessage(''); // Clear error message on successful submission
+        } catch (err) {
+            console.error(err.response.data);
+            if (err.response && err.response.status === 400) {
+                setErrorMessage(err.response.data.message);
+            } else {
+                setErrorMessage('Login failed');
+            }
+        }
     }
 
     return (

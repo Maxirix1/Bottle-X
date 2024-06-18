@@ -1,9 +1,10 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const cors = require("cors");
+const bcrypt = require('bcryptjs');
 const StudentModel = require('./models/Student');
-const existingStudents = require('./studentsData');
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 
@@ -13,19 +14,14 @@ app.post('/signup', async (req, res) => {
     const { name, ID, password } = req.body;
 
     try {
-        const studentData = existingStudents.find(student => student.ID === parseInt(ID) && student.name === name);
-        
-        if (!studentData) {
-            return res.status(400).json({ message: 'ชื่อและ Student ID ไม่ตรงกัน' });
-        }
-
         const existingStudent = await StudentModel.findOne({ ID: ID });
 
         if (existingStudent) {
             return res.status(400).json({ message: 'Student ID นี้ถูกใช้แล้ว' });
         }
 
-        const newStudent = new StudentModel({ name, ID, password });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newStudent = new StudentModel({ name, ID, password: hashedPassword });
         await newStudent.save();
         res.json(newStudent);
 
@@ -39,15 +35,37 @@ app.post('/login', async (req, res) => {
     const { ID, password } = req.body;
 
     try {
-        const student = await StudentModel.findOne({ ID: ID, password: password });
-        
+        const student = await StudentModel.findOne({ ID: ID });
+
         if (!student) {
             return res.status(400).json({ message: 'Student ID หรือรหัสผ่านไม่ถูกต้อง' });
         }
-        
-        res.json({ message: 'Login successful' });
+
+        const isPasswordValid = await bcrypt.compare(password, student.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Student ID หรือรหัสผ่านไม่ถูกต้อง' });
+        }
+
+        res.json({ message: 'Login successful', student: { name: student.name, ID: student.ID } });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.get('/user/:id', async (req, res) => {
+    const userID = req.params.id;
+
+    try {
+        const user = await StudentModel.findOne({ ID: userID });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user); // ส่งข้อมูลผู้ใช้กลับไปยัง client
+    } catch (error) {
+        console.error('Error fetching user:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
