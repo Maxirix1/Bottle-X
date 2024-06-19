@@ -36,7 +36,8 @@ const existingStudents = [
     { ID: 50037, name: "เกษม" },
     { ID: 50050, name: "จารุวัฒน์ จางศิริสกุลชัย" },
     { ID: 52091, name: "ภูวดล กัสปะ" },
-    { ID: 52639, name: "ทิเบต บุญญา" }
+    { ID: 52639, name: "ทิเบต บุญญา" },
+    { ID: 10001, name: "admin1"}
 ];
 
 module.exports = existingStudents;

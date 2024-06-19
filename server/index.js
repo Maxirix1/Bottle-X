@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const StudentModel = require('./models/Student');
+const existingStudents = require('./studentsData'); // Import existing student data
+
 const app = express();
 
 app.use(express.json());
@@ -14,6 +16,13 @@ app.post('/signup', async (req, res) => {
     const { name, ID, password } = req.body;
 
     try {
+        // Check if ID and name match the existing student data
+        const studentMatch = existingStudents.find(student => student.ID === parseInt(ID) && student.name === name);
+
+        if (!studentMatch) {
+            return res.status(400).json({ message: 'ID และชื่อไม่ตรงกัน' });
+        }
+
         const existingStudent = await StudentModel.findOne({ ID: ID });
 
         if (existingStudent) {
