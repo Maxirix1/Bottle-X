@@ -1,14 +1,17 @@
- header {
-    width: 60%;
+ #home-manage {
+    width: 80%;
     height: 80px;
     background-color: #6b6b6b34;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    border-radius: 25px;
-    margin: 0 auto;
+    /* justify-content: space-between; */
+    padding: 20px;
+    margin: 0 10vw;
     margin-top: 2vh;
+      padding: 0 30px; 
+    /*border-radius: 25px;
+    margin: 0;
+    margin-top: 2vh; */
   }
   html {
     scroll-behavior: smooth;
@@ -16,6 +19,10 @@
   .logo {
     width: 110px;
     margin-top: 8px;
+  }
+  .active {
+    background-color: rgb(66, 150, 203);
+    border-radius: 12px;
   }
   nav .logo {
     display: none;
@@ -30,6 +37,7 @@
     color: #ffffff;
     display: block;
     margin: 0 2px;
+    font-size: 1rem;
     font-weight: 600;
     padding: 8px 18px;
     transition: 0.5s;
@@ -39,10 +47,7 @@
   nav ul li a:hover {
     background: #7d828372;
   }
-  nav ul li a.active {
-    background: #ffffff;
-    color: #222222;
-  }
+
   .hamburger {
     display: none;
     height: fit-content;
@@ -60,9 +65,213 @@
     margin: 6px 0;
     background: #ffffff;
   }
-  .container {
+  .container-manage {
+    margin: 0;
+    padding: 0 0vw;
+  }
+  /* box-icon {
+    cursor: pointer;
+    margin-top: 0.7vh;
+  } */
+
+  .dataMain {
+    display: flex;
+    background: #0f496270;
+    padding: 30px;
+    margin: 0 10vw;
+    margin-top: 2vh;
+    border-radius: 30px;
+  }
+  .dataMain p {
+    font-size: 1.5rem;
+    margin: 0 30px;
+    font-weight: 600;
+  }
+  .dataMain p strong {
+    color: rgb(255, 255, 255);
+    font-weight: 500;
+  }
+  /* ------------------------Content---------------------------------- */
+  .content-main {
+    margin: 2vh 10vw;
+    padding: 1vw 6vw;
+    background: #0689b1;
+    border-radius: 30px;
+  }
+  .totalPoint > p{
+    font-size: 6rem;
+    font-weight: 600;
+    text-shadow: 5px 8px 5px #00000067;
+  }
+  .bottomContent {
+    display: flex;
+  }
+  .showPoint h1 {
+    margin-top: -20vh;
+    font-size: 13rem;
+    text-shadow: 5px 8px 5px #00000067;
+    font-weight: 600;
+    text-align: end;
+  }
+  .content-main img {
+    width: 230px;
+    height: auto;
+    margin-right: 50vw;
+    opacity: 0.3;
+  }
+  .pointMain {
+    display: flex;
+    font-size: 2rem;
+    font-weight: 600;
+    justify-content: space-evenly;
+    text-shadow: 5px 8px 5px #00000046;
+    padding: 0 5vw;
+  }
+  .pointMain strong  {
+    font-weight: 500;
+  }
+  .condition p {
+    text-align: end;
+    margin: 1vh 0;
+  }
+  .condition span {
+    color: red;
+  }
+
+  .buttonExchange {
+    padding: 0 10vw;
+  }
+
+  .button-1, .button-2 {
+    position: relative;
+    margin: 15px;
+    padding: 15px 100px;
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    transition: ease-out 0.1s;
+    border-radius: 30px;
+  }
+  .button-1 span, .button-2 span {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-left: -120px;
+    color: #fff;
+  }
+  .button-1 h1, .button-2  h1 {
+    font-size: 4rem;
+    margin-top: -2vh;
+  }
+  
+  /* button:hover {
+    color: white;
+    box-shadow: inset 0 -100px 0 0 #725AC1;
+  } */
+  
+  button:active {
+    transform: scale(0.9);
+  }
+  .button-1 {
+    border: 1px solid #4DB66A;
+    background-color: #4DB66A;
+  }
+
+  .button-2 {
+    border: 1px solid #3059EA;
+    background: #3059EA;
+  }
+
+
+  /* -----------------------------Responsive-------------------------------- */
+  @media screen and (max-width: 1100px) {
+    header {
+        width: 90%;
+        padding: 0 20px;
+        background-color: #0847f400;
+    }
+    nav {
+        position: absolute;
+        position: fixed;
+        left: -300px;
+        top: 0;
+        z-index: 999;
+        width: 280px;
+        height: 100vh;
+        background: #1c1f27;
+        transition: 0.5s;
+        box-shadow: 2px 0 20px 0 rgba(0, 0, 0, 0.194);
+    }
+    #nav_check:checked ~ nav {
+        left: 0;
+    }
+    nav .logo {
+        display: block;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        margin-left: 30px;
+    }
+    nav ul li a{
+        color: #ffffff;
+        margin-bottom: 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+    }
+    nav ul {
+        display: block;
+        padding: 0 20px;
+        margin-top: 30px;
+    }
+    .hamburger {
+        display: block;
+        position: fixed;
+        right: 12vw;
+        z-index: 999;
+        background-color: #60879162;
+    }
+}
+
+@media screen and (max-width: 1170px) {
+  .showPoint h1 {
+    font-size: 8rem;
+  }
+  .totalPoint > p {
+    font-size: 5rem;
+  }
+  .content-main img {
+    width: 200px;
+  }
+  .showPoint h1 {
+    margin-top: -15vh;
+  }
+  .pointMain {
+    padding: 0;
+  }
+  .pointMain p {
+    font-size: 1.5rem;
+  }
+  .button-1, .button-2 {
+    padding: 15px 80px;
+    width: 45%;
+  }
+  .buttonExchange button span {
+    font-size: 1.5rem;
+  }
+  .buttonExchange button h1 {
+    font-size: 3rem;
     margin: 0;
   }
-  box-icon {
-    cursor: pointer;
-  }
+
+}
+
+
+
+
+
+
+
+
+

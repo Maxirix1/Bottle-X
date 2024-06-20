@@ -30,7 +30,14 @@ app.post('/signup', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newStudent = new StudentModel({ name, ID, password: hashedPassword });
+        const newStudent = new StudentModel({ 
+            name, 
+            ID, 
+            password: hashedPassword,
+            totalPoint: 0,    
+            behavior: 0,   
+            volunteer: 0      
+        });
         await newStudent.save();
         res.json(newStudent);
 
