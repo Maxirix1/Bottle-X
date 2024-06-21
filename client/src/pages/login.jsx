@@ -3,12 +3,42 @@ import '../styles/login.css';
 import '../styles/font.css';
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Swal from 'sweetalert2'
 
 function Login() {
     const [ID, setID] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+
+    const handleClick = () => {
+        let timerInterval;
+        Swal.fire({
+          title: "Loading...",
+          html: "",
+          timer: 2000,
+          timerProgressBar: false,
+          didOpen: () => {
+            Swal.showLoading();
+            const timer = Swal.getPopup().querySelector("b");
+            timerInterval = setInterval(() => {
+              timer.textContent = `${Swal.getTimerLeft()}`;
+            }, 20);
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          }
+        }).then((result) => {
+
+          if (result.dismiss === Swal.DismissReason.timer) {
+            console.log("I was closed by the timer");
+            navigate('/manage'); // พาผู้ใช้ไปยังเส้นทางที่กำหนดหลังจาก popup ปิด
+          }
+
+        });
+
+        
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,6 +56,7 @@ function Login() {
                 setErrorMessage('Login failed');
             }
         }
+        
     }
 
     return (
@@ -56,7 +87,7 @@ function Login() {
 
                     {errorMessage && <p className="error-message">{errorMessage}</p>} 
                     
-                    <button className="button-23" role="button" type="submit">LOGIN</button>
+                    <button className="button-23" role="button" type="submit" onClick={handleClick}>LOGIN</button>
                     <div className="register-link">
                         <p>ยังไม่มีบัญชีใช่ไหม?<Link to="/signup"> สมัครสมาชิก</Link></p>
                         <Link to="/" className='link-home'>

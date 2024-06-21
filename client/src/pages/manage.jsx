@@ -114,7 +114,7 @@ function Manage() {
                     </div>
 
                     <div className="showPoint">
-                          <h1>{userData.totalPoint}<strong>Pt</strong></h1>
+                          <h1>{userData.totalPoint}<strong> Pt</strong></h1>
                         </div>
 
                         <div className="pointMain">

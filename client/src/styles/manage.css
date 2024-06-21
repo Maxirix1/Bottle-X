@@ -112,12 +112,14 @@
     text-shadow: 5px 8px 5px #00000067;
     font-weight: 600;
     text-align: end;
+    z-index: 999;
   }
   .content-main img {
     width: 230px;
     height: auto;
     margin-right: 50vw;
-    opacity: 0.3;
+    opacity: 0.4;
+    filter: drop-shadow(12px 15px 15px #3afeee);
   }
   .pointMain {
     display: flex;
@@ -140,11 +142,15 @@
 
   .buttonExchange {
     padding: 0 10vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .button-1, .button-2 {
     position: relative;
-    margin: 15px;
+    margin: 15px 2px;
+    width: 100%;
     padding: 15px 100px;
     text-align: center;
     font-size: 18px;
@@ -172,7 +178,7 @@
   } */
   
   button:active {
-    transform: scale(0.9);
+    transform: scale(0.99);
   }
   .button-1 {
     border: 1px solid #4DB66A;
@@ -253,18 +259,94 @@
   .pointMain p {
     font-size: 1.5rem;
   }
-  .button-1, .button-2 {
-    padding: 15px 80px;
-    width: 45%;
-  }
   .buttonExchange button span {
     font-size: 1.5rem;
   }
   .buttonExchange button h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin: 0;
   }
 
+}
+@media screen and (max-width: 890px) {
+  .content-main {
+    margin-bottom: 0;
+  }
+  .totalPoint > p {
+    font-size: 4rem;
+  }
+  .content-main img {
+    width: 150px;
+  }
+  .showPoint h1 {
+    font-size: 6rem;
+    margin-top: -10vh;
+  }
+  .button-1 , .button-2 {
+    padding: 15px 60px;
+  }
+  .buttonExchange button span {
+    font-size: 1.3rem;
+  }
+  .buttonExchange button h1 {
+    font-size: 2rem;
+  }
+}
+@media screen and (max-width: 700px) {
+  #home-manage {
+    margin: 0 5vw;
+    margin-top: 2vh;
+    width: 90%;
+  }
+  .totalPoint > p {
+    font-size: 3rem;
+  }
+  .dataMain {
+    padding: 15px;
+  }
+  .dataMain p {
+    font-weight: 400;
+    font-size: 20px;
+  }
+  .hamburger {
+    right: 8vw;
+  }
+  .dataMain {
+    margin: 0 5vw;
+    margin-top: 2vh;
+  }
+  .content-main {
+    margin: 2vh 5vw;
+  }
+  .buttonExchange {
+    padding: 0 5vw;
+  }
+  .showPoint h1 {
+    margin-top: -7vh;
+    font-weight: 500;
+    font-size: 4rem;
+  }
+  .showPoint h1 strong {
+    font-weight: 500;
+  }
+  .pointMain {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 2vh 0;
+    margin-bottom: 0;
+  }
+  .pointMain strong {
+    font-weight: 500;
+    font-size: 1.4rem;
+  }
+}
+@media screen and (max-width: 588px) {
+  .pointMain strong {
+    font-size: 14px;
+  }
+  .pointMain p {
+    font-size: 14px;
+  }
 }
 
 
