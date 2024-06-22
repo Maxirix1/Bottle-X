@@ -119,7 +119,7 @@
     height: auto;
     margin-right: 50vw;
     opacity: 0.4;
-    filter: drop-shadow(12px 15px 15px #3afeee);
+    filter: drop-shadow(20px 20px 20px #9efff7);
   }
   .pointMain {
     display: flex;
@@ -164,12 +164,11 @@
   .button-1 span, .button-2 span {
     font-size: 2rem;
     font-weight: 700;
-    margin-left: -120px;
     color: #fff;
   }
   .button-1 h1, .button-2  h1 {
-    font-size: 4rem;
-    margin-top: -2vh;
+    font-size: 3rem;
+    margin-top: -1vh;
   }
   
   /* button:hover {
@@ -285,9 +284,6 @@
   .button-1 , .button-2 {
     padding: 15px 60px;
   }
-  .buttonExchange button span {
-    font-size: 1.3rem;
-  }
   .buttonExchange button h1 {
     font-size: 2rem;
   }
@@ -297,6 +293,15 @@
     margin: 0 5vw;
     margin-top: 2vh;
     width: 90%;
+  }
+  #home-manage {
+    height: 60px;
+  }
+  .logo {
+    width: 80px;
+  }
+  .hamburger div {
+    width: 28px;
   }
   .totalPoint > p {
     font-size: 3rem;
@@ -339,6 +344,9 @@
     font-weight: 500;
     font-size: 1.4rem;
   }
+  .buttonExchange button {
+    padding: 15px 0;
+  }
 }
 @media screen and (max-width: 588px) {
   .pointMain strong {
@@ -346,6 +354,81 @@
   }
   .pointMain p {
     font-size: 14px;
+  }
+}
+@media screen and (max-width: 565px) {
+  .dataMain p {
+    font-size: 16px;
+  }
+  .buttonExchange button h1{
+    font-size: 22px;
+  }
+  .buttonExchange button span{
+    font-size: 17px;
+  }
+  .hamburger div {
+    width: 25px;
+  }
+}
+@media screen and (max-width: 485px) {
+  .dataMain p {
+    font-size: 14px;
+  }
+  .totalPoint > p {
+    font-size: 40px;
+    margin-top: 20px;
+  }
+  .buttonExchange button h1{
+    font-size: 22px;
+  }
+  .buttonExchange button span{
+    font-size: 17px;
+  }
+  .hamburger {
+    right: 10vw;
+  }
+}
+@media screen and (max-width: 445px) {
+  .dataMain p {
+    font-size: 14px;
+    margin: 0 10px;
+  }
+  .totalPoint > p {
+    font-size: 40px;
+    margin-top: 20px;
+  }
+}
+@media screen and (max-width: 399px) {
+  .dataMain p {
+    font-size: 14px;
+    margin: 0 10px;
+  }
+  .totalPoint > p {
+    font-size: 30px;
+    margin-top: 20px;
+  }
+  .buttonExchange button {
+    margin: 0px 2px;
+    padding: 10px 0px;
+    border-radius: 20px;
+  }
+  .buttonExchange button h1{
+    font-size: 18px;
+    margin-top: -0.5vh;
+  }
+  .buttonExchange button span{
+    font-size: 15px;
+    font-weight: 400;
+  }
+}
+@media screen and (max-width: 345px) {
+  .dataMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    line-height: 2.5vh;
+    padding: 10px 30px;
   }
 }
 

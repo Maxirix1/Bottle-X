@@ -10,58 +10,58 @@ import Swal from 'sweetalert2'
 function Manage() {
     const [userData, setUserData] = useState({});
     const location = useLocation();
+    const navigate = useNavigate();
     const userID = location.state ? location.state.userID : null;
 
-    const navigate = useNavigate();
-
-    const handleClick = () => {
-        let timerInterval;
-        Swal.fire({
-          title: "Loading...",
-          html: "",
-          timer: 2000,
-          timerProgressBar: false,
-          didOpen: () => {
-            Swal.showLoading();
-            const timer = Swal.getPopup().querySelector("b");
-            timerInterval = setInterval(() => {
-              timer.textContent = `${Swal.getTimerLeft()}`;
-            }, 20);
-          },
-          willClose: () => {
-            clearInterval(timerInterval);
-          }
-        }).then((result) => {
-
-          if (result.dismiss === Swal.DismissReason.timer) {
-            console.log("I was closed by the timer");
-            navigate('/'); // พาผู้ใช้ไปยังเส้นทางที่กำหนดหลังจาก popup ปิด
-          }
-
-        });
-
-        
-    };
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                if (userID) {
-                    const response = await axios.get(`http://localhost:3001/user/${userID}`);
+        const checkAuth = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/'); // Redirect to home if no token is found
+            } else {
+                try {
+                    // Optionally you can verify the token with the server
+                    const response = await axios.get(`http://localhost:3001/user/${userID}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
                     setUserData(response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                if (error.response && error.response.status === 404) {
-                    setUserData({ name: 'User not found', ID: 'Not available' });
-                } else {
-                    setUserData({ name: 'Error', ID: 'Error' });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    navigate('/'); // Redirect to home if any error occurs
                 }
             }
         };
 
-        fetchUserData();
-    }, [userID]);
+        checkAuth();
+    }, [navigate, userID]);
+
+    const handleClick = () => {
+        let timerInterval;
+        Swal.fire({
+            title: "Loading...",
+            html: "",
+            timer: 2000,
+            timerProgressBar: false,
+            didOpen: () => {
+                Swal.showLoading();
+                const timer = Swal.getPopup().querySelector("b");
+                timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                }, 20);
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log("I was closed by the timer");
+                navigate('/'); // Redirect to home after popup closes
+            }
+        });
+    };
 
     return (
         <div className="container-manage">
@@ -130,9 +130,9 @@ function Manage() {
 
             </div>
             <div className="buttonExchange">
-                    <button className="button-1"><span>แลกคะแนน</span><h1>พฤติกรรม</h1></button>
-                    <button className="button-2"><span>แลกคะแนน</span><h1>จิตอาสา</h1></button>
-                </div>
+                <button className="button-1" onClick={() => handleExchange('behavior')}><span>แลกคะแนน</span><h1>พฤติกรรม</h1></button>
+                <button className="button-2" onClick={() => handleExchange('volunteer')}><span>แลกคะแนน</span><h1>จิตอาสา</h1></button>
+            </div>
 
 
             </div>

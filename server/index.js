@@ -2,10 +2,12 @@ const express = require("express");
 const mongoose = require('mongoose');
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken'); // เพิ่ม jwt module
 const StudentModel = require('./models/Student');
 const existingStudents = require('./studentsData'); // Import existing student data
 
 const app = express();
+const secretKey = '@fteracdes921115!!!@@@'; // เพิ่ม secret key
 
 app.use(express.json());
 app.use(cors());
@@ -36,14 +38,15 @@ app.post('/signup', async (req, res) => {
             password: hashedPassword,
             totalPoint: 0,    
             behavior: 0,   
-            volunteer: 0      
+            volunteer: 0   
         });
+
         await newStudent.save();
         res.json(newStudent);
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
     }
 });
 
@@ -54,39 +57,52 @@ app.post('/login', async (req, res) => {
         const student = await StudentModel.findOne({ ID: ID });
 
         if (!student) {
-            return res.status(400).json({ message: 'Student ID หรือรหัสผ่านไม่ถูกต้อง' });
+            return res.status(400).json({ message: 'Student ID ไม่ถูกต้อง' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, student.password);
 
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Student ID หรือรหัสผ่านไม่ถูกต้อง' });
+            return res.status(400).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
         }
 
-        res.json({ message: 'Login successful', student: { name: student.name, ID: student.ID } });
+        const token = jwt.sign({ ID: student.ID }, secretKey, { expiresIn: '1h' }); // สร้าง token
+        res.json({ token, student });
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
     }
 });
 
 app.get('/user/:id', async (req, res) => {
-    const userID = req.params.id;
+    const { id } = req.params;
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ message: 'ไม่มี token ใน headers' });
+    }
+
+    const token = authHeader.split(' ')[1];
 
     try {
-        const user = await StudentModel.findOne({ ID: userID });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        const decoded = jwt.verify(token, secretKey); // ตรวจสอบ token
+        const student = await StudentModel.findOne({ ID: id });
+
+        if (!student) {
+            return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้' });
         }
 
-        res.json(user); // ส่งข้อมูลผู้ใช้กลับไปยัง client
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.json(student);
+
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ message: 'token ไม่ถูกต้องหรือหมดอายุ' });
     }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT} :)`);
+
+
+app.listen(3001, () => {
+    console.log("SERVER IS RUNNING!");
 });

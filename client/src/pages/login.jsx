@@ -1,9 +1,10 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import '../styles/login.css';
 import '../styles/font.css';
+import '../styles/system.css'
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 function Login() {
     const [ID, setID] = useState('');
@@ -12,33 +13,28 @@ function Login() {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        let timerInterval;
+                let timerInterval;
         Swal.fire({
-          title: "Loading...",
-          html: "",
-          timer: 2000,
-          timerProgressBar: false,
-          didOpen: () => {
-            Swal.showLoading();
-            const timer = Swal.getPopup().querySelector("b");
-            timerInterval = setInterval(() => {
-              timer.textContent = `${Swal.getTimerLeft()}`;
-            }, 20);
-          },
-          willClose: () => {
-            clearInterval(timerInterval);
-          }
+            title: "Loading...",
+            html: "",
+            timer: 2000,
+            timerProgressBar: false,
+            didOpen: () => {
+                Swal.showLoading();
+                const timer = Swal.getPopup().querySelector("b");
+                timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                }, 20);
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
         }).then((result) => {
-
-          if (result.dismiss === Swal.DismissReason.timer) {
-            console.log("I was closed by the timer");
-            navigate('/manage'); // พาผู้ใช้ไปยังเส้นทางที่กำหนดหลังจาก popup ปิด
-          }
-
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log("I was closed by the timer");
+            }
         });
-
-        
-    };
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,6 +42,7 @@ function Login() {
         try {
             const response = await axios.post('http://localhost:3001/login', { ID, password });
             console.log(response.data);
+            localStorage.setItem('token', response.data.token); // Save the token to localStorage
             navigate('/manage', { state: { userID: response.data.student.ID } });
             setErrorMessage(''); // Clear error message on successful submission
         } catch (err) {
@@ -56,7 +53,6 @@ function Login() {
                 setErrorMessage('Login failed');
             }
         }
-        
     }
 
     return (
