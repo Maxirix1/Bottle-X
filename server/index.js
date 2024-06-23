@@ -2,18 +2,24 @@ const express = require("express");
 const mongoose = require('mongoose');
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // เพิ่ม jwt module
+const jwt = require('jsonwebtoken');
 const StudentModel = require('./models/Student');
 const existingStudents = require('./studentsData'); // Import existing student data
 
 const app = express();
-const secretKey = '@fteracdes921115!!!@@@'; // เพิ่ม secret key
+const secretKey = '@fteracdes921115!!!@@@';
 
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb://127.0.0.1:27017/Student");
+mongoose.connect("mongodb://127.0.0.1:27017/Student", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
+// ------------------⬇️------------signup-----------------⬇️-------------
+
+// Routes
 app.post('/signup', async (req, res) => {
     const { name, ID, password } = req.body;
 
@@ -32,13 +38,13 @@ app.post('/signup', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newStudent = new StudentModel({ 
-            name, 
-            ID, 
+        const newStudent = new StudentModel({
+            name,
+            ID,
             password: hashedPassword,
-            totalPoint: 0,    
-            behavior: 0,   
-            volunteer: 0   
+            totalPoint: 0,
+            behavior: 0,
+            volunteer: 0
         });
 
         await newStudent.save();
@@ -49,6 +55,8 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
     }
 });
+
+// -----------------⬇️----------login----------⬇️------------------
 
 app.post('/login', async (req, res) => {
     const { ID, password } = req.body;
@@ -75,10 +83,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/user/:id', async (req, res) => {
-    const { id } = req.params;
+
+// ---------------⬇️-------------ตรวจสอบ authtoken----⬇️-----------------
+
+const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader) {
         return res.status(401).json({ message: 'ไม่มี token ใน headers' });
     }
@@ -86,7 +96,21 @@ app.get('/user/:id', async (req, res) => {
     const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, secretKey); // ตรวจสอบ token
+        const decoded = jwt.verify(token, secretKey); // Verify token
+        req.userID = decoded.ID; // Add decoded ID to request object
+        next();
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ message: 'token ไม่ถูกต้องหรือหมดอายุ' });
+    }
+};
+
+// --------------------⬇️-------เช็คชื่อและid--------------⬇️---------
+
+app.get('/user/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
         const student = await StudentModel.findOne({ ID: id });
 
         if (!student) {
@@ -97,12 +121,49 @@ app.get('/user/:id', async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(401).json({ message: 'token ไม่ถูกต้องหรือหมดอายุ' });
+        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
+    }
+});
+
+
+// ---------------------⬇️------------การแลกเปลี่ยนคะแนน----------⬇️--------------------
+
+app.post('/user/exchange/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { points, pointType } = req.body;
+
+    try {
+        const student = await StudentModel.findOne({ ID: id });
+
+        if (!student) {
+            return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้' });
+        }
+
+        if (points > student.totalPoint) {
+            return res.status(400).json({ message: 'คะแนนที่มีไม่เพียงพอที่จะแลก' });
+        }
+
+        const behaviorPoints = pointType === 'behavior' ? points / 10 : 0;
+        const volunteerPoints = pointType === 'volunteer' ? points / 10 : 0;
+
+        student.totalPoint -= points;
+        student.behavior += behaviorPoints;
+        student.volunteer += volunteerPoints;
+
+        await student.save();
+        res.json({ updatedUser: student });
+
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดในการแลกคะแนน:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการแลกคะแนน' });
     }
 });
 
 
 
-app.listen(3001, () => {
-    console.log("SERVER IS RUNNING!");
+// ----------------⬇️----------------port: 3001-----⬇️---------------
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
