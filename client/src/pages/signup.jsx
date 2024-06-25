@@ -24,14 +24,14 @@ function Signup() {
         }
 
         try {
-            // Check if name and ID match in the database
+ 
             const response = await axios.post('http://localhost:3001/check-student', { name, ID });
             console.log(response.data);
 
-            // If name and ID match, proceed with signup
+
             await axios.post('http://localhost:3001/signup', { name, ID, password });
             navigate('/login');
-            setErrorMessage(''); // Clear error message on successful submission
+            setErrorMessage('');
         } catch (err) {
             console.error(err.response.data);
             if (err.response && err.response.status === 400) {
