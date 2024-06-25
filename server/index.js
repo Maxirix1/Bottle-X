@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const StudentModel = require('./models/Student');
-const existingStudents = require('./studentsData'); // Import existing student data
+const StudentModel = require('./models/Student'); // Model for storing user credentials
+const ExistingStudent = require('./models/ExistingStudent'); // Model for existing student data
 
 const app = express();
 const secretKey = '@fteracdes921115!!!@@@';
@@ -17,15 +17,13 @@ mongoose.connect("mongodb://127.0.0.1:27017/Student", {
     useUnifiedTopology: true
 });
 
-// ------------------⬇️------------signup-----------------⬇️-------------
-
-// Routes
+// Signup route
 app.post('/signup', async (req, res) => {
     const { name, ID, password } = req.body;
 
     try {
-        // Check if ID and name match the existing student data
-        const studentMatch = existingStudents.find(student => student.ID === parseInt(ID) && student.name === name);
+        // Check if ID and name match the existing student data in MongoDB
+        const studentMatch = await ExistingStudent.findOne({ "student.student_no": ID, "student.name": name });
 
         if (!studentMatch) {
             return res.status(400).json({ message: 'ID และชื่อไม่ตรงกัน' });
@@ -44,7 +42,7 @@ app.post('/signup', async (req, res) => {
             password: hashedPassword,
             totalPoint: 0,
             behavior: 0,
-            volunteer: 0
+            volunteer: 0,
         });
 
         await newStudent.save();
@@ -56,8 +54,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-// -----------------⬇️----------login----------⬇️------------------
-
+// Login route
 app.post('/login', async (req, res) => {
     const { ID, password } = req.body;
 
@@ -83,9 +80,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
-// ---------------⬇️-------------ตรวจสอบ authtoken----⬇️-----------------
-
+// Verify token middleware
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
@@ -105,8 +100,26 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-// --------------------⬇️-------เช็คชื่อและid--------------⬇️---------
+// Check student route
+app.post('/check-student', async (req, res) => {
+    const { name, ID } = req.body;
 
+    try {
+        const studentMatch = await ExistingStudent.findOne({ "student.student_no": ID, "student.name": name });
+
+        if (!studentMatch) {
+            return res.status(400).json({ message: 'ID และชื่อไม่ตรงกัน' });
+        }
+
+        res.json({ message: 'ชื่อและ ID ตรงกัน' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบ' });
+    }
+});
+
+// Get user by ID route
 app.get('/user/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
@@ -125,9 +138,7 @@ app.get('/user/:id', verifyToken, async (req, res) => {
     }
 });
 
-
-// ---------------------⬇️------------การแลกเปลี่ยนคะแนน----------⬇️--------------------
-
+// Exchange points route
 app.post('/user/exchange/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { points, pointType } = req.body;
@@ -158,10 +169,6 @@ app.post('/user/exchange/:id', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการแลกคะแนน' });
     }
 });
-
-
-
-// ----------------⬇️----------------port: 3001-----⬇️---------------
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

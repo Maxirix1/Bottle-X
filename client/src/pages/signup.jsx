@@ -1,7 +1,9 @@
-import React, { useState } from 'react'; 
+// signup.jsx
+
+import React, { useState } from 'react';
 import '../styles/signup.css';
 import '../styles/font.css';
-import '../styles/system.css'
+import '../styles/system.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -13,7 +15,7 @@ function Signup() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
@@ -21,20 +23,23 @@ function Signup() {
             return;
         }
 
-        axios.post('http://localhost:3001/signup', { name, ID, password })
-            .then(result => {
-                console.log(result);
-                navigate('/login');
-                setErrorMessage(''); // Clear error message on successful submission
-            })
-            .catch(err => {
-                console.error(err.response.data);
-                if (err.response && err.response.status === 400) {
-                    setErrorMessage(err.response.data.message);
-                } else {
-                    setErrorMessage('Signup failed');
-                }
-            });
+        try {
+            // Check if name and ID match in the database
+            const response = await axios.post('http://localhost:3001/check-student', { name, ID });
+            console.log(response.data);
+
+            // If name and ID match, proceed with signup
+            await axios.post('http://localhost:3001/signup', { name, ID, password });
+            navigate('/login');
+            setErrorMessage(''); // Clear error message on successful submission
+        } catch (err) {
+            console.error(err.response.data);
+            if (err.response && err.response.status === 400) {
+                setErrorMessage(err.response.data.message);
+            } else {
+                setErrorMessage('Signup failed');
+            }
+        }
     };
 
     return (
@@ -43,23 +48,45 @@ function Signup() {
                 <h2>Create Account</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="input-box">
-                        <input type="text" placeholder="ชื่อ-นามสกุล (ไทย)" required 
-                        onChange={(e) => setName(e.target.value)} />
+                        <input
+                            type="text"
+                            placeholder="ชื่อ-นามสกุล (ไทย)"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
                     </div>
 
                     <div className="input-box">
-                        <input type="number" placeholder="Student ID" required 
-                        onChange={(e) => setID(e.target.value)} />
+                        <input
+                            type="text"
+                            placeholder="Student ID"
+                            required
+                            value={ID}
+                            onChange={(e) => setID(e.target.value)}
+                        />
                     </div>
 
                     <div className="input-box">
-                        <input type="password" placeholder="ตั้งรหัสผ่าน (6 ตัว)" maxLength="6" required 
-                        onChange={(e) => setPassword(e.target.value)} />
+                        <input
+                            type="password"
+                            placeholder="ตั้งรหัสผ่าน (6 ตัว)"
+                            maxLength="6"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                     </div>
 
                     <div className="input-box">
-                        <input type="password" placeholder="ยืนยันรหัสผ่าน (6 ตัว)" maxLength="6" required 
-                        onChange={(e) => setConfirmPassword(e.target.value)} />
+                        <input
+                            type="password"
+                            placeholder="ยืนยันรหัสผ่าน (6 ตัว)"
+                            maxLength="6"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
                     </div>
 
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -78,4 +105,3 @@ function Signup() {
 }
 
 export default Signup;
-``
