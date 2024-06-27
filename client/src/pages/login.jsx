@@ -7,53 +7,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 function Login() {
-    const [ID, setID] = useState('');
-    const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();
 
-    const handleClick = () => {
-                let timerInterval;
-        Swal.fire({
-            title: "Loading...",
-            html: "",
-            timer: 2000,
-            timerProgressBar: false,
-            didOpen: () => {
-                Swal.showLoading();
-                const timer = Swal.getPopup().querySelector("b");
-                timerInterval = setInterval(() => {
-                    timer.textContent = `${Swal.getTimerLeft()}`;
-                }, 20);
-            },
-            willClose: () => {
-                clearInterval(timerInterval);
-            }
-        }).then((result) => {
-            if (result.dismiss === Swal.DismissReason.timer) {
-                console.log("I was closed by the timer");
-            }
-        });
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        try {
-            const response = await axios.post('http://localhost:3001/login', { ID, password });
-            console.log(response.data);
-            localStorage.setItem('token', response.data.token); // Save the token to localStorage
-            navigate('/manage', { state: { userID: response.data.student.ID } });
-            setErrorMessage(''); // Clear error message on successful submission
-        } catch (err) {
-            console.error(err.response.data);
-            if (err.response && err.response.status === 400) {
-                setErrorMessage(err.response.data.message);
-            } else {
-                setErrorMessage('Login failed');
-            }
-        }
-    }
 
     return (
         <div className="container">
@@ -63,9 +17,9 @@ function Login() {
                     <div className="input-box">
                         <input 
                             type="number" 
-                            placeholder="Student ID" 
+                            placeholder="Student ID"
+                            maxLength="5" 
                             required 
-                            value={ID}
                             onChange={(e) => setID(e.target.value)} 
                         />
                     </div>
@@ -76,7 +30,6 @@ function Login() {
                             placeholder="รหัสผ่าน (6 ตัว)" 
                             maxLength="6" 
                             required 
-                            value={password}
                             onChange={(e) => setPassword(e.target.value)} 
                         />
                     </div>

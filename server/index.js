@@ -1,176 +1,98 @@
-const express = require("express");
+const express = require('express');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const cors = require("cors");
+const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const StudentModel = require('./models/Student'); // Model for storing user credentials
-const ExistingStudent = require('./models/ExistingStudent'); // Model for existing student data
 
 const app = express();
-const secretKey = '@fteracdes921115!!!@@@';
-
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(cors());
 
-mongoose.connect("mongodb://127.0.0.1:27017/Student", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+// เชื่อมต่อกับ MongoDB
+mongoose.connect('mongodb://localhost:27017/dbStudents', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-// Signup route
-app.post('/signup', async (req, res) => {
-    const { name, ID, password } = req.body;
-
-    try {
-        // Check if ID and name match the existing student data in MongoDB
-        const studentMatch = await ExistingStudent.findOne({ "student.student_no": ID, "student.name": name });
-
-        if (!studentMatch) {
-            return res.status(400).json({ message: 'ID และชื่อไม่ตรงกัน' });
-        }
-
-        const existingStudent = await StudentModel.findOne({ ID: ID });
-
-        if (existingStudent) {
-            return res.status(400).json({ message: 'Student ID นี้ถูกใช้แล้ว' });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newStudent = new StudentModel({
-            name,
-            ID,
-            password: hashedPassword,
-            totalPoint: 0,
-            behavior: 0,
-            volunteer: 0,
-        });
-
-        await newStudent.save();
-        res.json(newStudent);
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
-    }
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB');
 });
 
-// Login route
-app.post('/login', async (req, res) => {
-    const { ID, password } = req.body;
-
-    try {
-        const student = await StudentModel.findOne({ ID: ID });
-
-        if (!student) {
-            return res.status(400).json({ message: 'Student ID ไม่ถูกต้อง' });
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, student.password);
-
-        if (!isPasswordValid) {
-            return res.status(400).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
-        }
-
-        const token = jwt.sign({ ID: student.ID }, secretKey, { expiresIn: '1h' }); // สร้าง token
-        res.json({ token, student });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
-    }
+// สร้างโมเดล
+const studentSchema = new mongoose.Schema({
+  student_no: String,
+  name: String,
+  id_card: String,
+  tel: String,
+  race: String,
+  religion: String,
+  birthdateEN: String,
+  birthdateTH: String,
+  sex: String,
+  picture: String,
+  classroom_name: String,
+  grade: Number,
+  classroom: Number,
+  parent: {
+    name: String,
+    tel: String,
+  },
+  semester: {
+    year: Number,
+    term: Number,
+  },
+  address: {
+    full_address: String,
+    addressNo: String,
+    addressGroup: String,
+    addressAlley: String,
+    addressRoad: String,
+    addressDistrict: String,
+    addressSubDistrict: String,
+    addressProvince: String,
+    addressPostcode: String,
+  }
 });
 
-// Verify token middleware
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+const Student = mongoose.model('mainStudent', studentSchema);
 
-    if (!authHeader) {
-        return res.status(401).json({ message: 'ไม่มี token ใน headers' });
+// Route สำหรับการสมัครสมาชิก
+app.post('/api/register', async (req, res) => {
+  const { student_no, id_card, birthdateEN, password } = req.body;
+
+  if (!student_no || !id_card || !birthdateEN || !password) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+
+  try {
+    // ตรวจสอบว่ามีนักเรียนที่มี student_no, id_card, และ birthdateEN ตรงกันทั้งหมดหรือไม่
+    const existingStudent = await Student.findOne({ student_no, id_card, birthdateEN });
+
+    if (existingStudent) {
+      return res.status(400).json({ message: 'นักเรียนนี้ได้ลงทะเบียนแล้ว' });
     }
 
-    const token = authHeader.split(' ')[1];
+    // เพิ่มการเข้ารหัสรหัสผ่าน
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    try {
-        const decoded = jwt.verify(token, secretKey); // Verify token
-        req.userID = decoded.ID; // Add decoded ID to request object
-        next();
-    } catch (err) {
-        console.error(err);
-        res.status(401).json({ message: 'token ไม่ถูกต้องหรือหมดอายุ' });
-    }
-};
+    // สร้างผู้ใช้ใหม่ในฐานข้อมูล
+    const newStudent = new Student({
+      student_no,
+      password: hashedPassword,
+      // สามารถเพิ่มข้อมูลเพิ่มเติมของนักเรียนที่นี่ได้ตามต้องการ
+    });
 
-// Check student route
-app.post('/check-student', async (req, res) => {
-    const { name, ID } = req.body;
+    await newStudent.save();
 
-    try {
-        const studentMatch = await ExistingStudent.findOne({ "student.student_no": ID, "student.name": name });
-
-        if (!studentMatch) {
-            return res.status(400).json({ message: 'ID และชื่อไม่ตรงกัน' });
-        }
-
-        res.json({ message: 'ชื่อและ ID ตรงกัน' });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบ' });
-    }
+    res.status(200).json({ message: 'สมัครสมาชิกสำเร็จ' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-// Get user by ID route
-app.get('/user/:id', verifyToken, async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const student = await StudentModel.findOne({ ID: id });
-
-        if (!student) {
-            return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้' });
-        }
-
-        res.json(student);
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
-    }
-});
-
-// Exchange points route
-app.post('/user/exchange/:id', verifyToken, async (req, res) => {
-    const { id } = req.params;
-    const { points, pointType } = req.body;
-
-    try {
-        const student = await StudentModel.findOne({ ID: id });
-
-        if (!student) {
-            return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้' });
-        }
-
-        if (points > student.totalPoint) {
-            return res.status(400).json({ message: 'คะแนนที่มีไม่เพียงพอที่จะแลก' });
-        }
-
-        const behaviorPoints = pointType === 'behavior' ? points / 10 : 0;
-        const volunteerPoints = pointType === 'volunteer' ? points / 10 : 0;
-
-        student.totalPoint -= points;
-        student.behavior += behaviorPoints;
-        student.volunteer += volunteerPoints;
-
-        await student.save();
-        res.json({ updatedUser: student });
-
-    } catch (error) {
-        console.error('เกิดข้อผิดพลาดในการแลกคะแนน:', error);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการแลกคะแนน' });
-    }
-});
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// ตั้งค่าให้เซิร์ฟเวอร์รับฟังการเชื่อมต่อที่ port 5000
+app.listen(5000, () => {
+  console.log('Server is running on port 5000');
 });
